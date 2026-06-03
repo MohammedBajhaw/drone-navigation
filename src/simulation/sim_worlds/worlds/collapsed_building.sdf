@@ -1,0 +1,72 @@
+<sdf version="1.7">
+  <world name="collapsed_building">
+    <physics name="2ms" type="ode">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics" />
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"><render_engine>ogre2</render_engine></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands" />
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster" />
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.1 0.1 0.1 1</background>
+      <shadows>false</shadows>
+      <grid>false</grid> <!-- Disable grid for cleaner visual -->
+    </scene>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <light type="point" name="light_1"><pose>10 5 3 0 0 0</pose><diffuse>1 0.8 0.8 1</diffuse><attenuation><range>15</range></attenuation></light>
+    <light type="point" name="light_2"><pose>-15 10 3 0 0 0</pose><diffuse>0.8 0.8 1 1</diffuse><attenuation><range>15</range></attenuation></light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry></collision>
+        <visual name="visual"><geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
+        <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Base Building - Direct Absolute Path -->
+    <include>
+      <name>building_structure</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/willowgarage</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+
+    <!-- Rubble - Direct Absolute Path if possible, or model:// for working ones -->
+    <include><name>rubble_1</name><uri>model://jersey_barrier</uri><pose>12 2 0.4 0.8 0 1.57</pose></include>
+    <include><name>rubble_2</name><uri>model://jersey_barrier</uri><pose>12.5 4 0.3 -0.5 0.2 0</pose></include>
+    <include><name>rubble_3</name><uri>model://jersey_barrier</uri><pose>-8 6 0.5 1.2 0 -0.8</pose></include>
+    <include><name>rubble_4</name><uri>model://jersey_barrier</uri><pose>-12 3 0.2 0.3 0.1 1.2</pose></include>
+
+    <!-- Victims - Direct Absolute Path -->
+    <include><name>victim_randy_1</name><uri>model://Rescue Randy Sitting</uri><pose>14 5 0.05 0 0 3.14</pose></include>
+    
+    <include>
+      <name>victim_survivor_1</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/survivor_male</uri>
+      <pose>-10 8 0.05 0 0 -1.57</pose>
+    </include>
+
+    <include><name>victim_randy_2</name><uri>model://Rescue Randy Sitting</uri><pose>-22 2 0.05 0 0 0</pose></include>
+
+    <include>
+      <name>victim_survivor_2</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/survivor_male</uri>
+      <pose>5 20 0.05 0 0 1.57</pose>
+    </include>
+
+  </world>
+</sdf>

@@ -1,0 +1,200 @@
+<sdf version="1.9">
+  <world name="Mine">
+    <plugin
+        filename="gz-sim-physics-system"
+        name="gz::sim::systems::Physics">
+    </plugin>
+
+    <plugin
+        filename="gz-sim-sensors-system"
+        name="gz::sim::systems::Sensors">
+        <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <plugin
+        filename="gz-sim-scene-broadcaster-system"
+        name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+
+    <plugin
+        filename="gz-sim-user-commands-system"
+        name="gz::sim::systems::UserCommands">
+    </plugin>
+
+    <physics name="default_physics" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+      <gravity>0 0 -9.81</gravity>
+    </physics>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <pose>0 0 0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="Mine">
+      <pose>-0.40 118 0 1.5707 0 -0.35</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="starting_area_collision">
+          <geometry>
+            <mesh>
+              <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_StartingArea.DAE</uri>
+              <scale>2 2 2</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="starting_area_visual">
+          <geometry>
+            <mesh>
+              <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_StartingArea.DAE</uri>
+              <scale>2 2 2</scale>
+            </mesh>
+          </geometry>
+        </visual>
+
+        <!-- Sections 01 to 10 with absolute paths -->
+        <collision name="section_01_collision">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_01.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </collision>
+        <visual name="section_01_visual">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_01.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </visual>
+
+        <collision name="section_02_collision">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_02.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </collision>
+        <visual name="section_02_visual">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_02.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </visual>
+
+        <collision name="section_03_collision">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_03.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </collision>
+        <visual name="section_03_visual">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_03.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </visual>
+
+        <collision name="section_04_collision">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_04.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </collision>
+        <visual name="section_04_visual">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_04.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </visual>
+
+        <collision name="section_05_collision">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_05.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </collision>
+        <visual name="section_05_visual">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_05.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </visual>
+
+        <collision name="section_06_collision">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_06.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </collision>
+        <visual name="section_06_visual">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_06.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </visual>
+
+        <collision name="section_07_collision">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_07.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </collision>
+        <visual name="section_07_visual">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_07.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </visual>
+
+        <collision name="section_08_collision">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_08.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </collision>
+        <visual name="section_08_visual">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_08.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </visual>
+
+        <collision name="section_09_collision">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_09.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </collision>
+        <visual name="section_09_visual">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_09.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </visual>
+
+        <collision name="section_10_collision">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_10.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </collision>
+        <visual name="section_10_visual">
+          <geometry><mesh><uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/edgar_mine/meshes/Edgar_Section_10.DAE</uri><scale>2 2 2</scale></mesh></geometry>
+        </visual>
+      </link>
+    </model>
+
+    <!-- === Search and Rescue (SAR) Elements === -->
+    
+    <include>
+      <name>victim_randy_1</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/Rescue Randy Sitting</uri>
+      <pose>2 110 0.5 0 0 1.57</pose>
+    </include>
+
+    <include>
+      <name>victim_randy_2</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/Rescue Randy Sitting</uri>
+      <pose>-3 95 0.5 0 0 -0.8</pose>
+    </include>
+
+    <include>
+      <name>rubble_barrier_1</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/jersey_barrier</uri>
+      <pose>0.5 105 0.5 0 0 0.5</pose>
+    </include>
+
+    <include>
+      <name>rubble_barrier_2</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/jersey_barrier</uri>
+      <pose>-1.5 85 0.5 0 0 -0.5</pose>
+    </include>
+
+    <include>
+      <name>fire_ext_1</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/Fire Extinguisher</uri>
+      <pose>4 100 0.5 0 0 0</pose>
+    </include>
+
+  </world>
+</sdf>

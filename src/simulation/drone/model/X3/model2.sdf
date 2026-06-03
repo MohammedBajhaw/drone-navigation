@@ -1,0 +1,75 @@
+<?xml version="1.6"?>
+<sdf version="1.6">
+  <model name="Mavic2">
+    <link name="base_link">
+      <inertial>
+        <mass>0.907</mass>
+        <inertia>
+          <ixx>0.0008</ixx> <iyy>0.0008</iyy> <izz>0.0015</izz>
+          <ixy>0</ixy> <ixz>0</ixz> <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      
+      <visual name="visual">
+        <geometry><box><size>0.3 0.3 0.1</size></box></geometry>
+        <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+      </visual>
+      <visual name="arm1">
+         <pose>0.15 0 0 0 0 0</pose>
+         <geometry><box><size>0.1 0.02 0.02</size></box></geometry>
+         <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse></material>
+      </visual>
+      <collision name="collision">
+        <geometry><box><size>0.32 0.24 0.08</size></box></geometry>
+      </collision>
+    </link>
+
+    <link name="lidar_link">
+      <pose>0 0 0.05 0 0 0</pose> 
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>0.0001</ixx> <iyy>0.0001</iyy> <izz>0.0001</izz>
+          <ixy>0</ixy> <ixz>0</ixz> <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <sensor name="gpu_lidar" type="gpu_lidar">
+        <update_rate>10</update_rate>
+        <topic>scan</topic>
+        <visualize>false</visualize>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples> <resolution>1</resolution>
+              <min_angle>-3.14159</min_angle> <max_angle>3.14159</max_angle>
+            </horizontal>
+          </scan>
+          <range><min>0.15</min> <max>10.0</max></range>
+        </ray>
+      </sensor>
+    </link>
+    <joint name="lidar_joint" type="fixed">
+      <parent>base_link</parent> <child>lidar_link</child>
+    </joint>
+
+    <plugin
+      filename="ignition-gazebo-velocity-control-system"
+      name="ignition::gazebo::systems::VelocityControl">
+      <link_name>base_link</link_name>
+      <topic>/model/Mavic2/cmd_vel</topic>
+    </plugin>
+    
+    <plugin
+      filename="ignition-gazebo-pose-publisher-system"
+      name="ignition::gazebo::systems::PosePublisher">
+      <publish_link_pose>true</publish_link_pose>
+      <publish_sensor_pose>false</publish_sensor_pose>
+      <publish_collision_pose>false</publish_collision_pose>
+      <publish_visual_pose>false</publish_visual_pose>
+      <publish_nested_model_pose>true</publish_nested_model_pose>
+      <use_pose_vector_msg>true</use_pose_vector_msg>
+      <static_publisher>false</static_publisher>
+      <static_update_frequency>50</static_update_frequency>
+    </plugin>
+  </model>
+</sdf>

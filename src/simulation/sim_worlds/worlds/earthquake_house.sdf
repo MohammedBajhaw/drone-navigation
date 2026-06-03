@@ -1,0 +1,79 @@
+<sdf version="1.7">
+  <world name="earthquake_house">
+    <physics name="1ms" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics" />
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"><render_engine>ogre2</render_engine></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands" />
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster" />
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+
+    <scene>
+      <ambient>0.6 0.6 0.6 1</ambient>
+      <background>0.1 0.1 0.1 1</background>
+      <shadows>false</shadows>
+    </scene>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Indoor Lights -->
+    <light type="point" name="light_1"><pose>0 1.75 2.5 0 0 0</pose><diffuse>1 1 1 1</diffuse></light>
+    <light type="point" name="light_2"><pose>7 3 2.5 0 0 0</pose><diffuse>1 1 1 1</diffuse></light>
+    <light type="point" name="light_3"><pose>-3 0.5 2.5 0 0 0</pose><diffuse>1 1 1 1</diffuse></light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry></collision>
+        <visual name="visual"><geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
+        <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <include>
+      <name>house_structure</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/sim_world/model.sdf</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>collapsed_wall_1</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/jersey_barrier</uri>
+      <pose>3 1 0.4 0.8 0 1.57</pose>
+    </include>
+    
+    <include>
+      <name>collapsed_wall_2</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/jersey_barrier</uri>
+      <pose>8 -2 0.3 -0.5 0.2 0</pose>
+    </include>
+
+    <include>
+      <name>victim_1</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/Rescue Randy Sitting</uri>
+      <pose>11 3.5 0.05 0 0 3.14</pose>
+    </include>
+
+    <include>
+      <name>victim_2</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/Rescue Randy Sitting</uri>
+      <pose>2.5 1.5 0.05 0 0 -1.57</pose>
+    </include>
+
+    <include>
+      <name>victim_3</name>
+      <uri>/home/mohammed/oadrone_ws/src/simulation/sim_worlds/worlds/models/Rescue Randy Sitting</uri>
+      <pose>-3 0 0.05 0 0 0.5</pose>
+    </include>
+
+  </world>
+</sdf>

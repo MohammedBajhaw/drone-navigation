@@ -1,0 +1,194 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <model name="Iris">
+    <pose>0 0 0.2 0 0 0</pose>
+    
+    <link name="base_link">
+      <inertial>
+        <mass>1.5</mass>
+        <inertia>
+          <ixx>0.029125</ixx> <ixy>0</ixy> <ixz>0</ixz>
+          <iyy>0.029125</iyy> <iyz>0</iyz>
+          <izz>0.055225</izz>
+        </inertia>
+      </inertial>
+      
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>meshes/iris.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.05 0.05 0.3 1</ambient>
+          <diffuse>0.05 0.05 0.3 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+      </visual>
+      
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.47 0.47 0.11</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="rotor_0">
+      <pose>0.13 -0.22 0.023 0 0 0</pose>
+      <gravity>0</gravity>
+      <visual name="visual">
+        <geometry><mesh><uri>meshes/iris_prop_ccw.dae</uri></mesh></geometry>
+        <material><diffuse>0 0 0 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="rotor_0_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_0</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e+16</lower><upper>1e+16</upper></limit>
+      </axis>
+    </joint>
+
+    <link name="rotor_1">
+      <pose>-0.13 0.22 0.023 0 0 0</pose>
+      <gravity>0</gravity>
+      <visual name="visual">
+        <geometry><mesh><uri>meshes/iris_prop_ccw.dae</uri></mesh></geometry>
+        <material><diffuse>0 0 0 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="rotor_1_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e+16</lower><upper>1e+16</upper></limit>
+      </axis>
+    </joint>
+
+    <link name="rotor_2">
+      <pose>0.13 0.22 0.023 0 0 0</pose>
+      <gravity>0</gravity>
+      <visual name="visual">
+        <geometry><mesh><uri>meshes/iris_prop_cw.dae</uri></mesh></geometry>
+        <material><diffuse>0 0 0 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="rotor_2_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_2</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e+16</lower><upper>1e+16</upper></limit>
+      </axis>
+    </joint>
+
+    <link name="rotor_3">
+      <pose>-0.13 -0.22 0.023 0 0 0</pose>
+      <gravity>0</gravity>
+      <visual name="visual">
+        <geometry><mesh><uri>meshes/iris_prop_cw.dae</uri></mesh></geometry>
+        <material><diffuse>0 0 0 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="rotor_3_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_3</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e+16</lower><upper>1e+16</upper></limit>
+      </axis>
+    </joint>
+
+    <link name="lidar_link">
+      <pose>0 0 0.1 0 0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.000166</ixx> <ixy>0</ixy> <ixz>0</ixz>
+          <iyy>0.000166</iyy> <iyz>0</iyz>
+          <izz>0.000166</izz>
+        </inertia>
+      </inertial>
+      <sensor name="lidar" type="gpu_lidar">
+        <update_rate>10</update_rate>
+        <topic>scan</topic>
+        <visualize>true</visualize>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples> <resolution>1</resolution>
+              <min_angle>-3.14159</min_angle> <max_angle>3.14159</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>16</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.261799</min_angle>
+              <max_angle>0.261799</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.4</min> 
+            <max>10.0</max>
+          </range>
+        </ray>
+      </sensor>
+    </link>
+    <joint name="lidar_joint" type="fixed">
+      <parent>base_link</parent> <child>lidar_link</child>
+    </joint>
+
+    <plugin
+      filename="ignition-gazebo-velocity-control-system"
+      name="ignition::gazebo::systems::VelocityControl">
+      <link_name>base_link</link_name>
+      <topic>/cmd_vel</topic>
+      <link_profile>
+        <linear_velocity>
+          <i_min>0</i_min> <i_max>0</i_max>
+          <cmd_min>-15</cmd_min> <cmd_max>15</cmd_max>
+        </linear_velocity>
+      </link_profile>
+    </plugin>
+
+    <plugin
+      filename="ignition-gazebo-pose-publisher-system"
+      name="ignition::gazebo::systems::PosePublisher">
+      <publish_link_pose>true</publish_link_pose>
+      <publish_sensor_pose>true</publish_sensor_pose>
+      <publish_nested_model_pose>true</publish_nested_model_pose>
+      <use_pose_vector_msg>true</use_pose_vector_msg>
+      <update_frequency>50</update_frequency>
+    </plugin>
+
+    <plugin
+      filename="ignition-gazebo-odometry-publisher-system"
+      name="ignition::gazebo::systems::OdometryPublisher">
+      <odom_frame>odom</odom_frame>
+      <robot_base_frame>base_link</robot_base_frame>
+      <dimensions>3</dimensions>
+      <odom_publish_frequency>50</odom_publish_frequency>
+    </plugin>
+
+    <plugin filename="ignition-gazebo-joint-controller-system" name="ignition::gazebo::systems::JointController">
+      <joint_name>rotor_0_joint</joint_name>
+      <initial_velocity>25.0</initial_velocity>
+    </plugin>
+    <plugin filename="ignition-gazebo-joint-controller-system" name="ignition::gazebo::systems::JointController">
+      <joint_name>rotor_1_joint</joint_name>
+      <initial_velocity>-25.0</initial_velocity>
+    </plugin>
+    <plugin filename="ignition-gazebo-joint-controller-system" name="ignition::gazebo::systems::JointController">
+      <joint_name>rotor_2_joint</joint_name>
+      <initial_velocity>25.0</initial_velocity>
+    </plugin>
+    <plugin filename="ignition-gazebo-joint-controller-system" name="ignition::gazebo::systems::JointController">
+      <joint_name>rotor_3_joint</joint_name>
+      <initial_velocity>-25.0</initial_velocity>
+    </plugin>
+
+  </model>
+</sdf>

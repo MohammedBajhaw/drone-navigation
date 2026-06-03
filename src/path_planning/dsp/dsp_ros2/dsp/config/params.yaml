@@ -1,0 +1,25 @@
+dsp:
+  ros__parameters:
+    # إعدادات الخريطة
+    map_topic: "octomap_full"
+    
+    # إعدادات الأداء (مهمة جداً للسرعة)
+    spline_step: 0.1      # الخطوة لرسم المسار (0.1 أسرع من 0.05)
+    risk: 1               # نصف قطر الأمان (1 أسرع بكثير من 3)
+    update_rate: 1        # التحديث كل ثانية (يجب أن يكون عدداً صحيحاً)
+    RATE: 800.0           # معدل تحديث المسار الموصى به
+    
+    # عتبات العوائق (كما هي)
+    lower_thresh: 59
+    upper_thresh: 60
+    DSP_UNKNOWN: 10000
+    
+    # --- التصحيح هنا: أسماء الطائرة X3 ---
+    use_odometry: false
+    use_3d: true
+    odom_topic: "/X3/odom"            # كان go2/odom
+    odom_frame_id: "X3/odom"          # كان odom
+    base_link_frame_id: "X3/base_link" # كان base_link
+    
+    debug: false
+

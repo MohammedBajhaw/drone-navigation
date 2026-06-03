@@ -1,0 +1,29 @@
+# ROS2 build files
+build/
+install/
+log/
+
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Gazebo cache/logs
+~/.gazebo/
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

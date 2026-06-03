@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version="1.9">
+  <world name="cafe">
+    <physics type='ode'>
+        <max_step_size>0.001</max_step_size>  <!-- Varsayılan 0.01, daha yüksek bir değer kullanarak düşürebilirsiniz -->
+        <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+    <plugin filename="gz-sim-imu-system"
+        name="gz::sim::systems::Imu">
+    </plugin>
+    <!-- <scene>
+      <ambient>0 0 0</ambient>
+      <grid>false</grid>
+      <sky></sky>
+    </scene> -->
+
+    <light type="spot" name="spot_grid">
+      <pose>-3 0.5 2.7 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>1 1 1 1</specular>
+      <intensity>1</intensity>
+      <attenuation>
+        <range>12</range>
+        <linear>0.3</linear>
+        <constant>0.2</constant>
+        <quadratic>0.0</quadratic>
+      </attenuation>
+      <direction>0 0 -1</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>2.5</outer_angle>
+        <falloff>1</falloff>
+      </spot>
+      <cast_shadows>false</cast_shadows>
+      <visualize>false</visualize>
+    </light>
+
+    <light type="spot" name="spot_middle">
+      <pose>4 1.8 2.5 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>1 1 1 1</specular>
+      <intensity>1</intensity>
+      <attenuation>
+        <range>12</range>
+        <linear>0.3</linear>
+        <constant>0.2</constant>
+        <quadratic>0.0</quadratic>
+      </attenuation>
+      <direction>0 0 -1</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>2.5</outer_angle>
+        <falloff>1</falloff>
+      </spot>
+      <cast_shadows>false</cast_shadows>
+      <visualize>false</visualize>
+    </light>
+
+    <light type="spot" name="spot_longtable">
+      <pose>9 1 2.75 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>1 1 1 1</specular>
+      <intensity>1</intensity>
+      <attenuation>
+        <range>12</range>
+        <linear>0.3</linear>
+        <constant>0.2</constant>
+        <quadratic>0.0</quadratic>
+      </attenuation>
+      <direction>0 0 -1</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>2.5</outer_angle>
+        <falloff>1</falloff>
+      </spot>
+      <cast_shadows>false</cast_shadows>
+      <visualize>false</visualize>
+    </light>
+
+    <light type="point" name="point_column_01">
+      <pose>0 1.75 1.75 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>1 1 1 1</specular>
+      <intensity>1</intensity>
+      <attenuation>
+        <range>20</range>
+        <linear>0.2</linear>
+        <constant>0.8</constant>
+        <quadratic>0.5</quadratic>
+      </attenuation>
+      <cast_shadows>false</cast_shadows>
+      <visualize>false</visualize>
+    </light>
+
+    <light type="point" name="point_column_02">
+      <pose>7.4 3.4 1.71 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>1 1 1 1</specular>
+      <intensity>1</intensity>
+      <attenuation>
+        <range>20</range>
+        <linear>0.2</linear>
+        <constant>0.8</constant>
+        <quadratic>0.5</quadratic>
+      </attenuation>
+      <cast_shadows>false</cast_shadows>
+      <visualize>false</visualize>
+    </light>
+
+    <include>
+      <name>sim_world</name>
+      <uri>model://sim_worlds/worlds/sim_world/model.sdf</uri>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <static>1</static>
+    </include>
+
+  </world>
+</sdf>
+
