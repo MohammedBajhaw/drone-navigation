@@ -171,7 +171,7 @@ source install/setup.bash
 The script opens five terminal tabs: **Gazebo**, **TF bridge**, **Mapping** (OctoMap, planner and RViz), **Controller** and **Explorer**.
 
 <p align="center">
-  <img src="docs/images/rviz-displays.jpg" alt="RViz development setup" width="760"><br>
+  <img src="docs/images/rviz-displays.jpg" alt="RViz development setup" width="520"><br>
   <em>The RViz setup used during development: occupancy grid, planned path and coordinate frames.</em>
 </p>
 
