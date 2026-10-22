@@ -1,86 +1,90 @@
 <div align="center">
 
-# 🚁 OA-Drone — Obstacle-Avoidance Drone for Autonomous Cave Exploration
+# OA-Drone: Autonomous Cave Exploration & Obstacle Avoidance
 
-[![ROS2 Humble](https://img.shields.io/badge/ROS2-Humble-blue?logo=ros&logoColor=white)](https://docs.ros.org/en/humble/)
+[![ROS 2 Humble](https://img.shields.io/badge/ROS%202-Humble-blue?logo=ros&logoColor=white)](https://docs.ros.org/en/humble/)
 [![Ubuntu 22.04](https://img.shields.io/badge/Ubuntu-22.04-orange?logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/22.04/)
 [![Ignition Gazebo](https://img.shields.io/badge/Ignition-Gazebo%20Fortress-green?logo=gazebo&logoColor=white)](https://gazebosim.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**An autonomous drone system that navigates and explores cave/tunnel environments using 3D path planning and frontier-based exploration.**
+**The autonomy stack for a quadrotor that explores GPS-denied caves, tunnels and mines on its own: it maps in 3D, plans a collision-free path, chooses where to explore next and flies the path without touching the walls.**
 
-**طائرة بدون طيار ذاتية القيادة تستكشف الكهوف والأنفاق باستخدام تخطيط مسار ثلاثي الأبعاد واستكشاف قائم على الحدود (Frontier-Based Exploration).**
+📄 **Project page:** [bajhaw.com/projects/autonomous-cave-exploration-drone](https://bajhaw.com/projects/autonomous-cave-exploration-drone)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
+## Contents
 
 - [Overview](#overview)
+- [How it works](#how-it-works)
 - [Architecture](#architecture)
-- [Packages](#packages)
+- [Packages and scripts](#packages-and-scripts)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Project Structure](#project-structure)
 - [Configuration](#configuration)
+- [Project status](#project-status)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ---
 
-## 🔍 Overview
+## Overview
 
-OA-Drone is a ROS2-based autonomous exploration system designed for GPS-denied environments such as caves, tunnels, and mines. The drone:
+A drone flying through a cave cannot use GPS, cannot rely on light, and has walls only a metre or two away on every side. OA-Drone gives a quadrotor carrying a 3D LiDAR the software to cope with that: it builds a 3D map while it flies, plans a safe route through that map, picks the next area to explore and steers along the route by itself.
 
-1. **Maps** its surroundings in real-time using a 3D LiDAR sensor and OctoMap
-2. **Plans** collision-free paths through a 3D voxel grid using the DSP (D* Search Planner) algorithm
-3. **Explores** autonomously by detecting frontiers (boundaries between known and unknown space)
-4. **Avoids obstacles** in real-time while maintaining safe altitude and wall distance
+The system is built on **ROS 2 Humble** and **Ignition Gazebo Fortress** and has been developed and tested in simulation.
 
-### نظرة عامة (Arabic)
+## How it works
 
-نظام OA-Drone هو نظام استكشاف ذاتي مبني على ROS2، مصمم للبيئات المُغلقة والخالية من GPS مثل الكهوف والأنفاق والمناجم. تقوم الطائرة بـ:
-- رسم خريطة ثلاثية الأبعاد للبيئة المحيطة في الوقت الحقيقي
-- تخطيط مسارات آمنة لتجنب العوائق
-- الاستكشاف الذاتي بالبحث عن حدود الفراغات غير المستكشفة
-- تجنب الاصطدام بالجدران والعوائق ديناميكياً
+1. **Mapping:** the 3D LiDAR point cloud feeds **OctoMap**, which turns raw laser points into a voxel grid of free and occupied space (15 cm cells by default).
+2. **Planning:** a **D\*-based 3D planner** (DSP) searches that grid for a collision-free route and repairs it incrementally when new obstacles appear instead of replanning from scratch.
+3. **Exploring:** a **frontier explorer** finds the boundary between mapped and unknown space, picks a safe point on it and sends it to the planner as the next goal.
+4. **Flying:** a **tunnel controller** follows the path with look-ahead tracking, holds a safe altitude and keeps away from the walls.
 
----
+### Staying out of trouble
 
-## 🏗️ Architecture
+Caves are full of dead ends, so the system is designed to notice problems and recover:
+
+- The planner keeps a safety margin around every obstacle and smooths the path to avoid sharp turns.
+- The explorer rejects frontier targets that sit too close to a wall.
+- If the drone is commanded to move but barely moves for a couple of seconds, it stops, reverses and turns to give the LiDAR a new view, then replans.
+
+## Architecture
 
 ```mermaid
 graph TD
-    subgraph Gazebo["🌍 Ignition Gazebo Simulator"]
-        SDF["Cave World (SDF)"]
-        Drone["Iris Drone Model"]
-        LiDAR["3D LiDAR Sensor"]
+    subgraph Gazebo["Ignition Gazebo"]
+        SDF["Cave / mine world (SDF)"]
+        Drone["Iris quadrotor"]
+        LiDAR["3D LiDAR"]
     end
 
-    subgraph Bridge["🌉 ROS-Gazebo Bridge"]
-        B1["/cmd_vel → Drone"]
-        B2["/odom ← Drone"]
+    subgraph Bridge["ROS-Gazebo bridge"]
+        B1["/cmd_vel → drone"]
+        B2["/odom ← drone"]
         B3["/scan/points ← LiDAR"]
     end
 
-    subgraph Mapping["🗺️ 3D Mapping"]
-        OctoMap["OctoMap Server"]
+    subgraph Mapping["3D mapping"]
+        OctoMap["OctoMap server"]
         TF["TF2 (odom → base_link)"]
     end
 
-    subgraph Planning["📐 Path Planning"]
-        DSP["DSP Planner (D* Lite)"]
+    subgraph Planning["Path planning"]
+        DSP["DSP planner (D*)"]
         Path["/dsp/path"]
     end
 
-    subgraph Control["🎮 Flight Control"]
-        Controller["Tunnel Controller"]
+    subgraph Control["Flight control"]
+        Controller["Tunnel controller"]
         CmdVel["/cmd_vel"]
     end
 
-    subgraph Exploration["🔍 Autonomous Exploration"]
-        Explorer["Auto Explorer (Frontiers)"]
+    subgraph Exploration["Autonomous exploration"]
+        Explorer["Frontier explorer"]
         Goal["/dsp/set_goal"]
     end
 
@@ -92,40 +96,36 @@ graph TD
     Controller --> CmdVel --> B1 --> Drone
     TF --> DSP
     TF --> Explorer
-    OctoMap -->|projected_map| Explorer
+    OctoMap -->|projected map| Explorer
 ```
 
----
+## Packages and scripts
 
-## 📦 Packages
+### ROS 2 packages (`src/`)
 
-| Package | Type | Description |
-|---------|------|-------------|
-| `drone` | Simulation | Iris quadrotor model (SDF), sensors, and ROS-Gazebo bridge configuration |
-| `sim_bringup` | Simulation | Launch files for spawning the drone in Gazebo |
-| `sim_worlds` | Simulation | Cave/tunnel world models with 3D meshes and textures |
-| `dsp` | Path Planning | 3D D*-Lite path planner with OctoMap integration |
-| `dsp_interfaces` | Path Planning | Custom ROS2 service definitions for path cost queries |
+| Package | Role | Description |
+|---|---|---|
+| `drone` | Simulation | Iris quadrotor model (SDF), sensors and ROS-Gazebo bridge configuration |
+| `sim_bringup` | Simulation | Launch files that spawn the drone in Gazebo |
+| `sim_worlds` | Simulation | Test worlds: cave, mine, collapsed building, warehouse, office and more |
+| `dsp` | Path planning | 3D D\* planner with OctoMap integration |
+| `dsp_interfaces` | Path planning | Custom ROS 2 service definitions for path-cost queries |
 
-### Standalone Scripts (`run_scripts/`)
+### Mission scripts (`run_scripts/`)
 
 | Script | Description |
-|--------|-------------|
-| `auto_explorer.py` | Frontier-based autonomous exploration with stuck detection and goal re-sending |
-| `iris_dsp_controller.py` | 3D tunnel flight controller with look-ahead tracking and altitude control |
-| `odom_to_tf.py` | Broadcasts odometry data as TF transforms for the mapping pipeline |
+|---|---|
+| `auto_explorer.py` | Frontier-based exploration with stuck detection and goal re-sending |
+| `iris_dsp_controller.py` | 3D tunnel-flight controller with look-ahead tracking and altitude hold |
+| `odom_to_tf.py` | Publishes odometry as TF transforms for the mapping pipeline |
 
----
+## Requirements
 
-## ⚙️ Requirements
-
-### System
 - **OS:** Ubuntu 22.04 LTS
-- **ROS2:** Humble Hawksbill
+- **ROS 2:** Humble Hawksbill
 - **Simulator:** Ignition Gazebo Fortress
 - **Python:** 3.10+
 
-### ROS2 Dependencies
 ```bash
 sudo apt install \
   ros-humble-octomap \
@@ -136,156 +136,119 @@ sudo apt install \
   ros-humble-ros-gz-sim
 ```
 
----
+## Installation
 
-## 🚀 Installation
+The launch scripts expect the workspace at `~/oadrone_ws`.
 
-### 1. Clone the repository
 ```bash
-cd ~
-git clone https://github.com/<YOUR_USERNAME>/oadrone_ws.git
-cd oadrone_ws
-```
+# 1. Clone into the expected workspace folder
+git clone https://github.com/MohammedBajhaw/drone-navigation.git ~/oadrone_ws
+cd ~/oadrone_ws
 
-### 2. Install dependencies
-```bash
-# Install ROS2 dependencies
-rosdep install --from-paths src --ignore-src -r -y
-```
+# 2. Build and install the DSL search library used by the planner
+cd src/path_planning/dsp/dsl
+mkdir -p build && cd build
+cmake .. && sudo make install
+cd ~/oadrone_ws
 
-### 3. Build the workspace
-```bash
+# 3. Install ROS dependencies and build the workspace
 source /opt/ros/humble/setup.bash
+rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
 source install/setup.bash
 ```
 
----
+## Usage
 
-## 🎮 Usage
-
-### One-Command Launch
-The easiest way to start the full autonomous exploration mission:
+### One-command mission
 
 ```bash
 cd ~/oadrone_ws
 source install/setup.bash
-./start_mission.sh
+./start_mission.sh [world]
 ```
 
-This will open 5 terminal tabs:
-1. **Gazebo** — Simulation environment with the cave world
-2. **TF Bridge** — Odometry to TF transform broadcaster
-3. **Mapping** — OctoMap server, DSP planner, and RViz visualization
-4. **Controller** — 3D flight controller
-5. **Explorer** — Autonomous frontier explorer
+`world` selects the environment (default: `cave`):
 
-### Manual Launch (Step by Step)
+| Option | World |
+|---|---|
+| `cave` | Custom cave (default) |
+| `mine` | Edgar mine |
+| `disaster` | Disaster mine rescue scenario |
+| `house` / `ruins` | Collapsed building |
+| `warehouse` | Warehouse |
+| `office` | Office |
+| `room` | Experimental room |
+| `gas` | Gas station |
+| `park` | Playground park |
+| `fire` | Collapsed fire station |
+
+The script opens five terminal tabs: **Gazebo**, **TF bridge**, **Mapping** (OctoMap, planner and RViz), **Controller** and **Explorer**.
+
+### Manual launch
 
 ```bash
-# Terminal 1: Launch Gazebo simulation
+# Terminal 1: simulation
 ros2 launch sim_bringup iris.gazebo.launch.py
 
-# Terminal 2: Start TF bridge
+# Terminal 2: odometry → TF
 python3 run_scripts/odom_to_tf.py
 
-# Terminal 3: Start mapping and planning
+# Terminal 3: mapping and planning
 ros2 launch dsp iris_dsp_mapping.launch.py
 
-# Terminal 4: Start flight controller
+# Terminal 4: flight controller
 python3 run_scripts/iris_dsp_controller.py
 
-# Terminal 5: Start autonomous exploration
+# Terminal 5: autonomous exploration
 python3 run_scripts/auto_explorer.py
 ```
 
----
+## Configuration
 
-## 📁 Project Structure
-
-```
-oadrone_ws/
-├── src/
-│   ├── simulation/
-│   │   ├── drone/              # Iris quadrotor model & bridge config
-│   │   ├── sim_bringup/        # Launch files
-│   │   └── sim_worlds/         # Cave/tunnel world models
-│   └── path_planning/
-│       └── dsp/
-│           └── dsp_ros2/
-│               ├── dsp/        # 3D path planner (C++)
-│               └── dsp_interface/  # Custom service interfaces
-├── run_scripts/
-│   ├── auto_explorer.py        # Autonomous frontier explorer
-│   ├── iris_dsp_controller.py  # 3D flight controller
-│   └── odom_to_tf.py          # Odometry → TF broadcaster
-├── start_mission.sh            # One-command mission launcher
-├── LICENSE
-└── README.md
-```
-
----
-
-## ⚙️ Configuration
-
-### DSP Planner (`src/path_planning/dsp/dsp_ros2/dsp/config/params.yaml`)
+### Mapping (`src/path_planning/dsp/dsp_ros2/dsp/launch/iris_dsp_mapping.launch.py`)
 
 | Parameter | Default | Description |
-|-----------|---------|-------------|
-| `RATE` | `800.0` | Path update rate in milliseconds |
-| `risk` | `1` | Safety margin radius (voxels) |
+|---|---|---|
+| `resolution` | `0.15` | OctoMap voxel size (m) |
+| `sensor_model/max_range` | `8.0` | Maximum LiDAR range used for mapping (m) |
+| `occupancy_min_z` / `occupancy_max_z` | `0.2` / `5.0` | Height band kept in the map (m) |
+
+### Planner (`src/path_planning/dsp/dsp_ros2/dsp/config/params.yaml`)
+
+| Parameter | Default | Description |
+|---|---|---|
+| `RATE` | `800.0` | Path update period (ms) |
+| `risk` | `1` | Safety margin around obstacles (voxels) |
 | `spline_step` | `0.1` | Path smoothing resolution |
-| `update_rate` | `1` | Map update interval (seconds) |
+| `update_rate` | `1` | Map update interval (s) |
 
-### Flight Controller (`run_scripts/iris_dsp_controller.py`)
+### Flight controller (`run_scripts/iris_dsp_controller.py`)
 
 | Parameter | Default | Description |
-|-----------|---------|-------------|
-| `DEFAULT_ALTITUDE` | `0.8` | Hover altitude (meters) |
+|---|---|---|
+| `DEFAULT_ALTITUDE` | `0.8` | Hover altitude (m) |
 | `MAX_SPEED` | `0.8` | Maximum forward speed (m/s) |
-| `LOOK_AHEAD_DIST` | `1.0` | Path look-ahead distance (meters) |
+| `LOOK_AHEAD_DIST` | `1.0` | Path look-ahead distance (m) |
 | `LATERAL_GAIN` | `2.5` | Lateral correction gain |
 | `VERTICAL_GAIN` | `1.5` | Altitude correction gain |
 
 ### Explorer (`run_scripts/auto_explorer.py`)
 
 | Parameter | Default | Description |
-|-----------|---------|-------------|
-| `ACCEPTANCE_RADIUS` | `2.5` | Goal reached threshold (meters) |
-| `SAFETY_RADIUS_BLOCKS` | `2` | Min free blocks around target |
+|---|---|---|
+| `ACCEPTANCE_RADIUS` | `2.0` | Distance at which a goal counts as reached (m) |
+| `SAFETY_RADIUS_BLOCKS` | `3` | Minimum free cells required around a frontier target |
 
----
+## Project status
 
-## 📸 Screenshots
+This is a **simulation project**. The repository documents the system and its tuning values, but there is no formal benchmark of success rate or area covered, so none is claimed. Planning and control are independent of the simulator, so moving to a real vehicle means replacing the simulated sensors and flight interface.
 
-<!-- Add your screenshots here -->
-<!-- ![Gazebo Cave](docs/screenshots/gazebo_cave.png) -->
-<!-- ![RViz Mapping](docs/screenshots/rviz_mapping.png) -->
+## Acknowledgements
 
-*Screenshots coming soon — contributions welcome!*
+- The planner is based on [**dsp_ros2**](https://github.com/alitekes1/dsp_ros2) (@alitekes1).
+- It uses the [**DSL**](https://github.com/jhu-asco/dsl) D\* search library by Marin Kobilarov and Matt Sheckells (Johns Hopkins University), distributed under the Mozilla Public License 2.0 (see `src/path_planning/dsp/dsl/LICENSE`).
 
----
+## License
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
-
----
-
-<div align="center">
-
-**Built with ❤️ using ROS2 Humble & Ignition Gazebo**
-
-</div>
+This project is released under the MIT License (see [LICENSE](LICENSE)). Third-party components keep their original licenses.
