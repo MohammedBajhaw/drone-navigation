@@ -11,6 +11,9 @@
 
 📄 **Project page:** [bajhaw.com/projects/autonomous-cave-exploration-drone](https://bajhaw.com/projects/autonomous-cave-exploration-drone)
 
+<img src="docs/images/tunnel-octomap.jpg" alt="3D OctoMap of a tunnel built live from LiDAR" width="760"><br>
+<em>The tunnel as the drone sees it: a 3D map built live from LiDAR, coloured by height.</em>
+
 </div>
 
 ---
@@ -52,52 +55,34 @@ Caves are full of dead ends, so the system is designed to notice problems and re
 - The explorer rejects frontier targets that sit too close to a wall.
 - If the drone is commanded to move but barely moves for a couple of seconds, it stops, reverses and turns to give the LiDAR a new view, then replans.
 
+<p align="center">
+  <img src="docs/images/rviz-mission.jpg" alt="Mission in progress in RViz" width="760"><br>
+  <em>A mission in progress: the 3D map in RViz, with the planner and flight-controller terminals alongside.</em>
+</p>
+
 ## Architecture
 
-```mermaid
-graph TD
-    subgraph Gazebo["Ignition Gazebo"]
-        SDF["Cave / mine world (SDF)"]
-        Drone["Iris quadrotor"]
-        LiDAR["3D LiDAR"]
-    end
+<p align="center">
+  <img src="docs/images/architecture.png" alt="System architecture" width="900"><br>
+  <em>The simulator and bridge feed mapping, the planner and explorer decide where to go, and the controller turns the path into flight commands.</em>
+</p>
 
-    subgraph Bridge["ROS-Gazebo bridge"]
-        B1["/cmd_vel → drone"]
-        B2["/odom ← drone"]
-        B3["/scan/points ← LiDAR"]
-    end
+Data flow: the LiDAR point cloud (`/scan/points`) builds the OctoMap → the explorer sends frontier goals to the planner (`/dsp/set_goal`) → the planner publishes `/dsp/path` → the controller converts it to `/cmd_vel` for the drone.
 
-    subgraph Mapping["3D mapping"]
-        OctoMap["OctoMap server"]
-        TF["TF2 (odom → base_link)"]
-    end
+### Maps and test worlds
 
-    subgraph Planning["Path planning"]
-        DSP["DSP planner (D*)"]
-        Path["/dsp/path"]
-    end
+The map is stored as voxels, so the planner works with solid obstacles instead of millions of raw laser points.
 
-    subgraph Control["Flight control"]
-        Controller["Tunnel controller"]
-        CmdVel["/cmd_vel"]
-    end
-
-    subgraph Exploration["Autonomous exploration"]
-        Explorer["Frontier explorer"]
-        Goal["/dsp/set_goal"]
-    end
-
-    LiDAR --> B3 --> OctoMap
-    Drone --> B2 --> TF
-    OctoMap --> DSP
-    Explorer -->|frontier goal| Goal --> DSP
-    DSP --> Path --> Controller
-    Controller --> CmdVel --> B1 --> Drone
-    TF --> DSP
-    TF --> Explorer
-    OctoMap -->|projected map| Explorer
-```
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/octomap-closeup.jpg" alt="OctoMap close-up around the drone"></td>
+    <td width="50%"><img src="docs/images/gazebo-warehouse.jpg" alt="Simulated quadrotor in a test world"></td>
+  </tr>
+  <tr>
+    <td><em>Occupied space around the drone, close up.</em></td>
+    <td><em>The simulated quadrotor in one of the test worlds.</em></td>
+  </tr>
+</table>
 
 ## Packages and scripts
 
@@ -184,6 +169,11 @@ source install/setup.bash
 | `fire` | Collapsed fire station |
 
 The script opens five terminal tabs: **Gazebo**, **TF bridge**, **Mapping** (OctoMap, planner and RViz), **Controller** and **Explorer**.
+
+<p align="center">
+  <img src="docs/images/rviz-displays.jpg" alt="RViz development setup" width="760"><br>
+  <em>The RViz setup used during development: occupancy grid, planned path and coordinate frames.</em>
+</p>
 
 ### Manual launch
 
